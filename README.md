@@ -14,7 +14,9 @@ Have you ever forgetten how to spell an ID, or had so many class names that you 
 
 ## Release Notes
 
+### 0.1.2
 
+Added extension icon
 
 ### 0.1.0
 

@@ -2,8 +2,9 @@
   "name": "html-refactoring",
   "displayName": "HTML Refactoring",
   "description": "Refactor html tags ID and Class names",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "publisher": "trackerjo",
+  "icon": "media/extension_icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/TrackerJo/html-refactoring"
