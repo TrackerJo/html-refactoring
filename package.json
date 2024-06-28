@@ -2,7 +2,7 @@
   "name": "html-refactoring",
   "displayName": "HTML Refactoring",
   "description": "Refactor html tags ID and Class names",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.90.0"
   },
