@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { parseHTML } from './parser';
+import { parseCSS, parseHTML } from './parser';
 import { SidebarProvider } from './SidebarProvider';
 import { GlobalStorageService } from './storage';
 
@@ -20,7 +20,7 @@ type Reference = {
 
 };
 
-type parsedAttribute = {
+export type parsedAttribute = {
 	name: string;
 	value: string;
 	start: number;
@@ -46,6 +46,15 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.languages.registerHoverProvider('html', {
 
 		provideHover(document, position, token) {
+
+			return hoverProvider(document, position, token, storageManager);
+		}
+	});
+
+	vscode.languages.registerHoverProvider('css', {
+		
+		provideHover(document, position, token) {
+
 			return hoverProvider(document, position, token, storageManager);
 		}
 	});
@@ -82,6 +91,27 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.languages.registerCompletionItemProvider('html', {
+		provideCompletionItems(document, position, token, context) {
+			const ids: Attribute[] = storageManager.getValue(vscode.workspace.name! + "-ids") || [];
+			const classes: Attribute[] = storageManager.getValue(vscode.workspace.name! + "-classes") || [];
+			const completionItems: vscode.CompletionItem[] = [];
+			ids.forEach((id) => {
+				const item = new vscode.CompletionItem(id.name, vscode.CompletionItemKind.Variable);
+				item.detail = "ID";
+				item.documentation = id.description;
+				completionItems.push(item);
+			});
+			classes.forEach((classN) => {
+				const item = new vscode.CompletionItem(classN.name, vscode.CompletionItemKind.Variable);
+				item.detail = "Class";
+				item.documentation = classN.description;
+				completionItems.push(item);
+			});
+			return completionItems;	
+		}
+	});
+
+	vscode.languages.registerCompletionItemProvider('css', {
 		provideCompletionItems(document, position, token, context) {
 			const ids: Attribute[] = storageManager.getValue(vscode.workspace.name! + "-ids") || [];
 			const classes: Attribute[] = storageManager.getValue(vscode.workspace.name! + "-classes") || [];
@@ -287,133 +317,141 @@ export function activate(context: vscode.ExtensionContext) {
 		const fileExtension = fileName?.split('.').pop();
 		const editor = vscode.window.activeTextEditor;
 		const projectName = vscode.workspace.name;
-
+		let changedAttributes: parsedAttribute[] = [];
 
 		if (fileExtension === 'html') {
 
+			changedAttributes = parseHTML(currentLine);
+
 			
-			const classes: Attribute[] = storageManager.getValue(projectName + "-classes") || [];
-			let ids:Attribute[] = storageManager.getValue(projectName + "-ids") || [];
 
-			const changedAttributes = parseHTML(currentLine);
 
-			if(changedAttributes){
+		} else if(fileExtension === "css"){
+			changedAttributes = parseCSS(currentLine);
+			console.log(changedAttributes);
+		}
+
+		const classes: Attribute[] = storageManager.getValue(projectName + "-classes") || [];
+		const ids:Attribute[] = storageManager.getValue(projectName + "-ids") || [];
+
+		if(changedAttributes){
 			
-				for (let i = 0; i < changedAttributes.length; i++) {
-					const attribute = changedAttributes[i];
-					if (attribute.name === 'id') {
-						//Check if ID changed
-						
-						if(currentID !== attribute.value && currentID !== ""){
+			for (let i = 0; i < changedAttributes.length; i++) {
+				const attribute = changedAttributes[i];
+				if (attribute.name === 'id') {
+					//Check if ID changed
+					
+					if(currentID !== attribute.value && currentID !== ""){
 
-							updateID(ids, currentID, fileName, pastLineNumber);
-						}
-						const id = ids.find((id: { name: string; }) => {
-							return id.name === attribute.value;
-						});
-						if(id){
-
-							
-
-								//Check if reference already exists
-								const refExists = id.references.some((ref: { filePath: string; line: number; start: number; end: number; }) => {
-									return ref.filePath === fileName && ref.line === pastLineNumber;
-								});
-								if(!refExists){
-									id.references.push({filePath: fileName, line: pastLineNumber, start: attribute.start, end: attribute.end});
-								} else {
-									//Update the reference
-									const ref = id.references.find((ref: { filePath: string; line: number; start: number; end: number; }) => {
-										return ref.filePath === fileName && ref.line === pastLineNumber;
-									});
-
-									if(ref){
-										ref.start = attribute.start;
-										ref.end = attribute.end;
-									}
-
-								}
-								
-
-
-						} else {
-							if(attribute.value !== ""){
-								ids.push({name: attribute.value, id: generateId(), description: "", references: [
-									{
-										filePath: fileName,
-										line: pastLineNumber,
-										start: attribute.start,
-										end: attribute.end,
-										
-									}
-								]});
-							}
-						}
-						//Update the storage
-						storageManager.setValue(projectName + "-ids", ids);
-						//Update the sidebar
-						sidebarProvider._view?.webview.postMessage({type: "update-ids", ids: ids});
-						
-
-								
-								
-		
-
-						
-					} else if (attribute.name === 'class') {
-						if(currentClass !== attribute.value && currentClass !== ""){
-
-							updateClass(classes, currentClass, fileName, pastLineNumber);
-						}
-						const classN = classes.find((classN: { name: string; }) => {
-							return classN.name === attribute.value;
-						});
-						if(classN){
-
-							
-
-								//Check if reference already exists
-								const refExists = classN.references.some((ref: { filePath: string; line: number; start: number; end: number; }) => {
-									return ref.filePath === fileName && ref.line === pastLineNumber;
-								});
-								if(!refExists){
-									classN.references.push({filePath: fileName, line: pastLineNumber, start: attribute.start, end: attribute.end});
-								} else {
-									//Update the reference
-									const ref = classN.references.find((ref: { filePath: string; line: number; start: number; end: number; }) => {
-										return ref.filePath === fileName && ref.line === pastLineNumber;
-									});
-
-									if(ref){
-										ref.start = attribute.start;
-										ref.end = attribute.end;
-									}
-
-								}
-								
-
-
-						} else {
-							if(attribute.value !== ""){
-								classes.push({name: attribute.value, id: generateId(),description: "", references: [
-									{
-										filePath: fileName,
-										line: pastLineNumber,
-										start: attribute.start,
-										end: attribute.end
-									}
-								]});
-							}
-						}
-						//Update the storage
-						storageManager.setValue(projectName + "-classes", classes);
-						//Update the sidebar
-						sidebarProvider._view?.webview.postMessage({type: "update-classes", classes: classes});
-						
+						updateID(ids, currentID, fileName, pastLineNumber);
 					}
+					const id = ids.find((id: { name: string; }) => {
+						return id.name === attribute.value;
+					});
+					if(id){
+
+					
+
+						//Check if reference already exists
+						const refExists = id.references.some((ref: { filePath: string; line: number; start: number; end: number; }) => {
+							return ref.filePath === fileName && ref.line === pastLineNumber;
+						});
+						if(!refExists){
+							id.references.push({filePath: fileName, line: pastLineNumber, start: attribute.start, end: attribute.end});
+						} else {
+							//Update the reference
+							const ref = id.references.find((ref: { filePath: string; line: number; start: number; end: number; }) => {
+								return ref.filePath === fileName && ref.line === pastLineNumber;
+							});
+
+							if(ref){
+								ref.start = attribute.start;
+								ref.end = attribute.end;
+							}
+
+						}
+							
+
+
+					} else {
+						if(attribute.value !== ""){
+							ids.push({name: attribute.value, id: generateId(), description: "", references: [
+								{
+									filePath: fileName,
+									line: pastLineNumber,
+									start: attribute.start,
+									end: attribute.end,
+									
+								}
+							]});
+						}
+					}
+					//Update the storage
+					storageManager.setValue(projectName + "-ids", ids);
+					//Update the sidebar
+					sidebarProvider._view?.webview.postMessage({type: "update-ids", ids: ids});
+					
+
+							
+							
+	
+
+					
+				} else if (attribute.name === 'class') {
+					if(currentClass !== attribute.value && currentClass !== ""){
+
+						updateClass(classes, currentClass, fileName, pastLineNumber);
+					}
+					const classN = classes.find((classN: { name: string; }) => {
+						return classN.name === attribute.value;
+					});
+					if(classN){
+
+						
+
+							//Check if reference already exists
+							const refExists = classN.references.some((ref: { filePath: string; line: number; start: number; end: number; }) => {
+								return ref.filePath === fileName && ref.line === pastLineNumber;
+							});
+							if(!refExists){
+								classN.references.push({filePath: fileName, line: pastLineNumber, start: attribute.start, end: attribute.end});
+							} else {
+								//Update the reference
+								const ref = classN.references.find((ref: { filePath: string; line: number; start: number; end: number; }) => {
+									return ref.filePath === fileName && ref.line === pastLineNumber;
+								});
+
+								if(ref){
+									ref.start = attribute.start;
+									ref.end = attribute.end;
+								}
+
+							}
+							
+
+
+					} else {
+						if(attribute.value !== ""){
+							classes.push({name: attribute.value, id: generateId(),description: "", references: [
+								{
+									filePath: fileName,
+									line: pastLineNumber,
+									start: attribute.start,
+									end: attribute.end
+								}
+							]});
+						}
+					}
+					//Update the storage
+					storageManager.setValue(projectName + "-classes", classes);
+					//Update the sidebar
+					sidebarProvider._view?.webview.postMessage({type: "update-classes", classes: classes});
+					
 				}
 			}
+		}
 
+		if(fileExtension === "html"){
 			//Get current line
 			currentLine = editor!.document.lineAt(editor!.selection.active.line).text!;
 			const newAttributes = parseHTML(currentLine);
@@ -430,9 +468,23 @@ export function activate(context: vscode.ExtensionContext) {
 				currentID = "";
 				currentClass = "";
 			}
-			
-
-
+		} else if(fileExtension === "css"){
+			//Get current line
+			currentLine = editor!.document.lineAt(editor!.selection.active.line).text!;
+			const newAttributes = parseCSS(currentLine);
+			if(newAttributes){
+				for (let i = 0; i < newAttributes.length; i++) {
+					const attribute = newAttributes[i];
+					if (attribute.name === 'id') {
+						currentID = attribute.value;
+					} else if (attribute.name === 'class') {
+						currentClass = attribute.value;
+					}
+				}
+			} else {
+				currentID = "";
+				currentClass = "";
+			}
 		}
 
 	}
@@ -530,15 +582,21 @@ export async function refactor(list: Attribute, newValue: string){
 
 function hoverProvider(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, storageManager: GlobalStorageService){
 	const range = document.getWordRangeAtPosition(position);
-	const word = document.getText(range);
+	let word = document.getText(range);
+	//Cut off the # or . from the word
+	if(word[0] === "#" || word[0] === "."){
+		word = word.slice(1);
+	}
 	const projectName = vscode.workspace.name;
 	const ids: Attribute[] = storageManager.getValue(projectName! + "-ids") || [];
 	const id = ids.find((id: { name: string; }) => {
 		return id.name === word;
 	});
+
 	if(id){
 		//Check if position is within the range of the ID
 		const filePath = document.fileName;
+		
 		const ref = id.references.find((ref: { filePath: string; line: number; start: number; end: number; }) => {
 			return ref.filePath === filePath&& ref.line === position.line && position.character >= ref.start && position.character <= ref.end;
 		});

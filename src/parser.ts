@@ -1,3 +1,6 @@
+import { parsedAttribute } from "./extension";
+
+
 export function parseHTML(html: string) {
     console.log(html);
 
@@ -9,7 +12,7 @@ export function parseHTML(html: string) {
     let attributeName = "";
     let attributeValue = "";
     let readStartQuote = false;
-    let attributes = [];
+    let attributes: parsedAttribute[] = [];
     let readStart = false;
     let start = 0;
     let end = 0;
@@ -70,7 +73,208 @@ export function parseHTML(html: string) {
 
 
     }
+
+    return attributes;
 }
+
+export function parseCSS(css: string) {
+
+    let c = "";
+    let cString = "";
+    let readingID = false;
+    let readingClass = false;
+    let readingOther = false;
+    let readingQuotes = false;
+
+    let attributes: parsedAttribute[] = [];
+
+
+    for (let i = 0; i < css.length; i++) {
+        c = css[i];
+        if(c==="."&& !readingQuotes){
+            if(readingID) {
+                let idData = {
+                    name: "id",
+                    value: cString,
+                    start: i - cString.length,
+                    end: i
+                };
+                attributes.push(idData);
+                cString = "";
+                readingID = false;
+            } else if(readingClass){
+                let classData = {
+                    name: "class",
+                    value: cString,
+                    start: i - cString.length,
+                    end: i
+                };
+                attributes.push(classData);
+                cString = "";
+
+            } else {
+                readingClass = true;
+                cString = "";
+            }
+
+        } else if(c === "#"&& !readingQuotes){
+            if(readingClass) {
+                let classData = {
+                    name: "class",
+                    value: cString,
+                    start: i - cString.length,
+                    end: i
+                };
+                attributes.push(classData);
+                cString = "";
+                readingClass = false;
+            } else if(readingID){
+                let idData = {
+                    name: "id",
+                    value: cString,
+                    start: i - cString.length,
+                    end: i
+                };
+                attributes.push(idData);
+                cString = "";
+            } else {
+                readingID = true;
+                cString = "";
+            }
+        } else if(c === " " && !readingQuotes){
+            if(readingID) {
+                let idData = {
+                    name: "id",
+                    value: cString,
+                    start: i - cString.length,
+                    end: i
+                };
+                attributes.push(idData);
+                cString = "";
+                readingID = false;
+            } else if(readingClass){
+                let classData = {
+                    name: "class",
+                    value: cString,
+                    start: i - cString.length,
+                    end: i
+                };
+                attributes.push(classData);
+                cString = "";
+                readingClass = false;
+            } else {
+                cString = "";
+            }
+        } else if(c === '"'){
+            if(readingQuotes){
+                readingQuotes = false;
+            } else {
+                readingQuotes = true;
+            }
+        } else if(c === ":" && !readingQuotes){
+            if(readingID) {
+                let idData = {
+                    name: "id",
+                    value: cString,
+                    start: i - cString.length,
+                    end: i
+                };
+                attributes.push(idData);
+                cString = "";
+                readingID = false;
+            } else if(readingClass){
+                let classData = {
+                    name: "class",
+                    value: cString,
+                    start: i - cString.length,
+                    end: i
+                };
+                attributes.push(classData);
+                cString = "";
+                readingClass = false;
+            } else {
+                cString = "";
+            }
+        } else if(c === "[" && !readingQuotes){
+            if(readingID) {
+                let idData = {
+                    name: "id",
+                    value: cString,
+                    start: i - cString.length,
+                    end: i
+                };
+                attributes.push(idData);
+                cString = "";
+                readingID = false;
+            } else if(readingClass){
+                let classData = {
+                    name: "class",
+                    value: cString,
+                    start: i - cString.length,
+                    end: i
+                };
+                attributes.push(classData);
+                cString = "";
+                readingClass = false;
+            } else {
+                cString = "";
+            }
+        } else if(c === "{" && !readingQuotes){
+            if(readingID) {
+                let idData = {
+                    name: "id",
+                    value: cString,
+                    start: i - cString.length,
+                    end: i
+                };
+                attributes.push(idData);
+                cString = "";
+                readingID = false;
+            } else if(readingClass){
+                let classData = {
+                    name: "class",
+                    value: cString,
+                    start: i - cString.length,
+                    end: i
+                };
+                attributes.push(classData);
+                cString = "";
+                readingClass = false;
+            } else {
+                cString = "";
+            }
+        }
+        else {
+            cString += c;
+        }
+    }
+    if(readingID) {
+        let idData = {
+            name: "id",
+            value: cString,
+            start: css.length - cString.length,
+            end: css.length
+        };
+        attributes.push(idData);
+        cString = "";
+        readingID = false;
+    }
+    if(readingClass){
+        let classData = {
+            name: "class",
+            value: cString,
+            start: css.length - cString.length,
+            end: css.length
+        };
+        attributes.push(classData);
+        cString = "";
+        readingClass = false;
+    }
+
+    return attributes;
+}
+
+
 
 function removeWhitespace(html: string) {
     let i = 0;
@@ -88,4 +292,4 @@ function removeWhitespace(html: string) {
     return cleanedHTML;
 }
 
-console.log(parseHTML("   <div id=\"swfewfwefewfwef\"class=\"2cdcdcefefe\">"));
+console.log(parseCSS(".test"));
