@@ -1,0 +1,215 @@
+body {
+    height: 100vh;
+    overflow: hidden;
+}
+
+
+.window {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+
+.ids-list, .classes-list{
+    overflow: scroll;
+    max-height: 90%;
+}
+
+
+
+.actions {
+    display: none;
+    margin-left: auto;
+}
+
+.active .actions {
+    display: flex;
+}
+
+.pane-header:hover .actions {
+    display: flex;
+}
+
+.monaco-toolbar {
+    height: 100%;
+}
+
+.monaco-action-bar {
+    height: 100%;
+    white-space: nowrap;
+}
+
+.monaco-action-bar .actions-container {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    margin: 0 auto;
+    padding: 0;
+    width: 100%;
+}
+
+.monaco-action-bar .action-item {
+    align-items: center;
+    cursor: pointer;
+    display: block;
+    justify-content: center;
+    position: relative;
+    padding-right: 5px;
+}
+
+.monaco-pane-view .pane>.pane-header>.actions .action-item {
+    margin-right: 4px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.monaco-pane-view .pane>.pane-header>.actions .action-label {
+    padding: 2px;
+}
+
+.monaco-workbench .codicon[class*=codicon-] {
+    font-size: 16px;
+}
+
+.monaco-action-bar .action-item .codicon {
+    align-items: center;
+    display: flex;
+    height: 16px;
+    width: 16px;
+}
+
+.monaco-workbench .codicon {
+    /* color: var(--vscode-icon-foreground); */
+}
+
+.monaco-action-bar .action-label {
+    border-radius: 5px;
+    color: var(--vscode-foreground);
+
+
+
+}
+
+
+.action-label:active {
+    outline: 0 !important;
+}
+
+.action-label:hover {
+    outline: 1px dashed var(--vscode-toolbar-hoverOutline);
+    outline-offset: -1px;
+    background-color: var(--vscode-toolbar-hoverBackground);
+
+
+
+}
+
+.action-label:focus {
+    opacity: 1;
+    outline-color: var(--vscode-focusBorder);
+    outline-offset: -1px;
+    outline: 0 !important;
+
+    outline-style: solid;
+    outline-width: 1px;
+}
+
+.active, .collapsible:hover {
+    background-color: #555; 
+}
+
+
+
+
+.content {
+    padding: 0 18px;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.2s ease-out;
+    background-color: rgb(33, 37, 43);
+    width: 100vw;
+    position: relative;
+    left: -25px;
+}
+
+.pane{
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    width: 100vw;
+    position: relative;
+    left: -20px;
+}
+
+.pane-header{
+    line-height: 22px;
+    color: var(--vscode-sideBarSectionHeader-foreground);
+    background-color: var(--vscode-sideBarSectionHeader-background);
+    border-top: 1px solid var(--vscode-sideBarSectionHeader-border);
+    position: relative;
+    align-items: center;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    font-size: 11px;
+    font-weight: 700;
+    height: 22px;
+    overflow: hidden;
+}
+
+.pane-header-title{
+    font-size: 11px;
+    min-width: 3ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    text-transform: uppercase;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    display: block;
+}
+
+.pane-indicator {
+    color: var(--vscode-icon-foreground);
+
+}
+
+.pane.active .pane-header{
+    opacity: 1;
+    outline-color: var(--vscode-focusBorder);
+    outline-offset: -1px;
+    outline-style: solid;
+    outline-width: 1px;
+}
+
+.snippet {
+    /* (A1) FONT & COLORS */
+    font-size: 1.2em;
+    color: #fff;
+    background: #282c34;
+    
+    /* (A2) DIMENSIONS */
+    padding: 15px;
+    border-radius: 10px;
+    width: 80vw;
+    text-align: start;
+    position: relative;
+    cursor:default;
+    top: -5px;
+}
+
+.ref {
+
+    cursor: pointer;
+}
+
+.ref:hover {
+color: var(--vscode-textLink-activeForeground);
+}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+    
+        <meta http-equiv="Content-Security-Policy" content="img-src https: data:; style-src 'unsafe-inline' ${
+        webview.cspSource
+        }; script-src 'nonce-${nonce}';">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="${styleResetUri}" rel="stylesheet">
+        <link href="${styleVSCodeUri}" rel="stylesheet">
+        <script nonce="${nonce}">
+            const vscode = acquireVsCodeApi();
+        </script>
+
+
+    </head>
+    <body>
+        <div class="window">
+            
+            <div class="pane vertical classes-pane active">
+                <div class="pane-header">
+                    <div class="codicon codicon-chevron-down pane-indicator"></div>
+                    <h3 class="pane-header-title">Classes</h3>
+                    <div class="actions">
+                        <div class="monaco-toolbar">
+                            <div class="monaco-action-bar">
+                                <ul class="actions-container" role="toolbar" aria-label="delete actions">
+                                    <li class="action-item menu-entry" role="presentation" custom-hover="true">
+                                        <a class="action-label codicon codicon-add" role="button" aria-label="Add Class..." tabindex="0" id="add-class-button"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content classes-content" style="height: 100vh;">
+                <div class="classes-list">
+
+                </div>
+
+
+            </div>
+            
+            <div class="pane vertical ids-pane">
+                <div class="pane-header">
+                    <div class="codicon codicon-chevron-right pane-indicator"></div>
+                    <h3 class="pane-header-title">IDs</h3>
+                    <div class="actions">
+                        <div class="monaco-toolbar">
+                            <div class="monaco-action-bar">
+                                <ul class="actions-container" role="toolbar" aria-label="delete actions">
+                                    <li class="action-item menu-entry" role="presentation" custom-hover="true">
+                                        <a class="action-label codicon codicon-add" role="button" aria-label="Add id..." tabindex="0" id="add-id-button"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content ids-content">
+
+                    <div class="ids-list">
+                        
+                    </div>
+                    <div class="divider">
+
+                    </div>
+
+
+            </div>
+        </div>
+        
+            
+
+        
+       
+
+        <script src="${scriptUri}" nonce="${nonce}"></script>
+    
+    </body>
+</html>
