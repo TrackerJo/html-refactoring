@@ -20,53 +20,53 @@ export function parseHTML(html: string) {
     for (i = 0; i < html.length; i++) {
         c = html[i];
 
-        
+
         if (c === "<" && !readingAttribute) {
             readingTag = true;
             readStart = true;
-        } else if (!readStart){
+        } else if (!readStart) {
 
         }
-        
-        else if((c === ' ' || c === '>') && readingTag) {
+
+        else if ((c === ' ' || c === '>') && readingTag) {
             readingTag = false;
             console.log(tag);
             tag = "";
         } else if (readingTag) {
             tag += c;
-        } else if(c === "=" && !readingAttribute) {
+        } else if (c === "=" && !readingAttribute) {
             readingAttribute = true;
 
 
         }
-        else 
-        if(readingAttribute) {
-            if(c === '"' && !readStartQuote) {
-                readStartQuote = true;
-                start = i + 1;
-            } else if (c === '"' && readStartQuote) {
-                readingAttribute = false;
-                end = i;
-                readStartQuote = false;
+        else
+            if (readingAttribute) {
+                if (c === '"' && !readStartQuote) {
+                    readStartQuote = true;
+                    start = i + 1;
+                } else if (c === '"' && readStartQuote) {
+                    readingAttribute = false;
+                    end = i;
+                    readStartQuote = false;
 
-                attributes.push({name: attributeName, value: attributeValue, start: start, end: end});
+                    attributes.push({ name: attributeName, value: attributeValue, start: start, end: end });
 
-                attributeName = "";
-                attributeValue = "";
-            } else {
-                attributeValue += c;
+                    attributeName = "";
+                    attributeValue = "";
+                } else {
+                    attributeValue += c;
+                }
+
             }
 
-        }
-       
-        else if(c !== " " && c !== ">" ){
-            attributeName += c;
-        } else if(c === '>' ) {
-            console.log("End of tag");
-            return attributes;
-        }
+            else if (c !== " " && c !== ">") {
+                attributeName += c;
+            } else if (c === '>') {
+                console.log("End of tag");
+                return attributes;
+            }
 
-        
+
 
 
 
@@ -85,14 +85,15 @@ export function parseCSS(css: string) {
     let readingClass = false;
     let readingOther = false;
     let readingQuotes = false;
+    let isLine = false;
 
     let attributes: parsedAttribute[] = [];
 
 
     for (let i = 0; i < css.length; i++) {
         c = css[i];
-        if(c==="."&& !readingQuotes){
-            if(readingID) {
+        if (c === "." && !readingQuotes) {
+            if (readingID) {
                 let idData = {
                     name: "id",
                     value: cString,
@@ -102,7 +103,7 @@ export function parseCSS(css: string) {
                 attributes.push(idData);
                 cString = "";
                 readingID = false;
-            } else if(readingClass){
+            } else if (readingClass) {
                 let classData = {
                     name: "class",
                     value: cString,
@@ -117,8 +118,8 @@ export function parseCSS(css: string) {
                 cString = "";
             }
 
-        } else if(c === "#"&& !readingQuotes){
-            if(readingClass) {
+        } else if (c === "#" && !readingQuotes) {
+            if (readingClass) {
                 let classData = {
                     name: "class",
                     value: cString,
@@ -128,7 +129,7 @@ export function parseCSS(css: string) {
                 attributes.push(classData);
                 cString = "";
                 readingClass = false;
-            } else if(readingID){
+            } else if (readingID) {
                 let idData = {
                     name: "id",
                     value: cString,
@@ -141,8 +142,8 @@ export function parseCSS(css: string) {
                 readingID = true;
                 cString = "";
             }
-        } else if(c === " " && !readingQuotes){
-            if(readingID) {
+        } else if (c === " " && !readingQuotes) {
+            if (readingID) {
                 let idData = {
                     name: "id",
                     value: cString,
@@ -152,7 +153,7 @@ export function parseCSS(css: string) {
                 attributes.push(idData);
                 cString = "";
                 readingID = false;
-            } else if(readingClass){
+            } else if (readingClass) {
                 let classData = {
                     name: "class",
                     value: cString,
@@ -165,14 +166,14 @@ export function parseCSS(css: string) {
             } else {
                 cString = "";
             }
-        } else if(c === '"'){
-            if(readingQuotes){
+        } else if (c === '"') {
+            if (readingQuotes) {
                 readingQuotes = false;
             } else {
                 readingQuotes = true;
             }
-        } else if(c === ":" && !readingQuotes){
-            if(readingID) {
+        } else if (c === ":" && !readingQuotes) {
+            if (readingID) {
                 let idData = {
                     name: "id",
                     value: cString,
@@ -182,7 +183,7 @@ export function parseCSS(css: string) {
                 attributes.push(idData);
                 cString = "";
                 readingID = false;
-            } else if(readingClass){
+            } else if (readingClass) {
                 let classData = {
                     name: "class",
                     value: cString,
@@ -195,8 +196,8 @@ export function parseCSS(css: string) {
             } else {
                 cString = "";
             }
-        } else if(c === "[" && !readingQuotes){
-            if(readingID) {
+        } else if (c === "[" && !readingQuotes) {
+            if (readingID) {
                 let idData = {
                     name: "id",
                     value: cString,
@@ -206,7 +207,7 @@ export function parseCSS(css: string) {
                 attributes.push(idData);
                 cString = "";
                 readingID = false;
-            } else if(readingClass){
+            } else if (readingClass) {
                 let classData = {
                     name: "class",
                     value: cString,
@@ -219,8 +220,8 @@ export function parseCSS(css: string) {
             } else {
                 cString = "";
             }
-        } else if(c === "{" && !readingQuotes){
-            if(readingID) {
+        } else if (c === "{" && !readingQuotes) {
+            if (readingID) {
                 let idData = {
                     name: "id",
                     value: cString,
@@ -230,7 +231,7 @@ export function parseCSS(css: string) {
                 attributes.push(idData);
                 cString = "";
                 readingID = false;
-            } else if(readingClass){
+            } else if (readingClass) {
                 let classData = {
                     name: "class",
                     value: cString,
@@ -243,12 +244,18 @@ export function parseCSS(css: string) {
             } else {
                 cString = "";
             }
+        } else if (c === ";") {
+            isLine = true;
+            readingID = false;
+            readingClass = false;
+            break;
+
         }
         else {
             cString += c;
         }
     }
-    if(readingID) {
+    if (readingID) {
         let idData = {
             name: "id",
             value: cString,
@@ -259,7 +266,7 @@ export function parseCSS(css: string) {
         cString = "";
         readingID = false;
     }
-    if(readingClass){
+    if (readingClass) {
         let classData = {
             name: "class",
             value: cString,
@@ -282,10 +289,10 @@ function removeWhitespace(html: string) {
     let cleanedHTML = "";
     while (i < html.length) {
         if (html[i] === "<") {
-        reachedStart = true;
+            reachedStart = true;
         }
         if (reachedStart) {
-        cleanedHTML += html[i];
+            cleanedHTML += html[i];
         }
         i++;
     }

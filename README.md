@@ -14,6 +14,10 @@ Have you ever forgetten how to spell an ID, or had so many class names that you 
 
 ## Release Notes
 
+### 0.2.0
+
+Fixed CSS parsing to ignore lines that include ';'
+
 ### 0.1.3
 
 Added support for css files
